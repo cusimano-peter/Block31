@@ -11,10 +11,8 @@ const client = new Client({
     connectionString: process.env.DATABASE_URL || 'postgres://localhost/acme_notes_db',
 });
 
-// Middleware to parse JSON
 app.use(express.json()); 
 
-// Serve static files
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // API route
@@ -34,7 +32,6 @@ async function init() {
         await client.connect();
         console.log('Connected to the database.');
 
-        // Corrected SQL commands with proper syntax
         const SQL = `
             DROP TABLE IF EXISTS notes;
             CREATE TABLE notes(
