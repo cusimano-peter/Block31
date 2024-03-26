@@ -3,10 +3,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const { Client } = require("pg");
-
-// Correct the port initialization to check for process.env.PORT
 const port = process.env.PORT || 3000;
-
 const client = new Client({
   connectionString:
     process.env.DATABASE_URL || "postgres://localhost/acme_hr_db",
@@ -19,9 +16,8 @@ app.use(express.static(path.join(__dirname, "../dist")));
 // API route
 app.get("/api/employees", async (req, res) => {
   try {
-    const response = await client.query("SELECT * FROM notes");
+    const response = await client.query("SELECT * FROM employees");
     res.json(response.rows);
-    console.log("broken", response);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -35,20 +31,18 @@ async function init() {
     console.log("Connected to the database.");
 
     const SQL = `
-            DROP TABLE IF EXISTS notes;
-            CREATE TABLE notes(
-                id SERIAL PRIMARY KEY,
-                txt VARCHAR(255),
-                starred BOOLEAN DEFAULT FALSE
-            );
-            INSERT INTO notes(txt, starred) VALUES('learn express', false);
-            INSERT INTO notes(txt, starred) VALUES('write SQL queries', true);
-            INSERT INTO notes(txt) VALUES('create routes');
-            INSERT INTO notes(txt, starred) VALUES('Hello', true);
-            INSERT INTO notes(txt) VALUES('Goodbye');
-        `;
+              DROP TABLE IF EXISTS employees;
+              CREATE TABLE employees(
+                  id SERIAL PRIMARY KEY,
+                  name VARCHAR(255) NOT NULL,
+                  position VARCHAR(255) NOT NULL,
+                  is_admin BOOLEAN DEFAULT FALSE
+              );
+              INSERT INTO employees(name, position, is_admin) VALUES('Alice Smith', 'Manager', false);
+              INSERT INTO employees(name, position, is_admin) VALUES('Bob Jones', 'Director', true);
+              INSERT INTO employees(name, position) VALUES('Charlie Brown', 'Analyst');
+          `;
 
-    // Execute the SQL command
     await client.query(SQL);
     console.log("Database initialized.");
 
